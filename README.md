@@ -31,7 +31,13 @@ npm install
 ### Parse a string into an abstract syntax tree (AST)
 
 ```ts
-import { parseAST, query, rule, statement } from "@wecandobetter/oql";
+import {
+  parseAST,
+  ParseType,
+  query,
+  rule,
+  statement,
+} from "@wecandobetter/oql";
 
 // Parse a query into an abstract syntax tree (AST).
 // A query consists of one or more statements.
@@ -50,8 +56,9 @@ const ruleTree = rule`
   }
 `;
 
-// Parse any supported OQL string into an AST.
-const ast = parseAST("match (p:Person);");
+// Use the parse function to parse a string into an AST.
+// Supports `query`, `statement`, and `rule` types.
+const ast = parseAST(ParseType.Statement, "match (p:Person);");
 ```
 
 If you want the [chevrotain](https://chevrotain.io/) concrete syntax tree (CST),
