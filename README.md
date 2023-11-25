@@ -66,6 +66,8 @@ const cst = parseCST("match (p:Person);");
 ## Roadmap
 
 - [ ] Finalize the grammar.
+- [ ] Finalize the AST.
+- [ ] Finalize the parser.
 - [ ] Write unit tests.
 - [ ] Develop a runtime which executes queries against an Odin knowledge graph.
 - [ ] Optimizations.
