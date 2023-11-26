@@ -54,6 +54,13 @@ export const When = createKeyword("when");
 export const Then = createKeyword("then");
 export const Perform = createKeyword("perform");
 
+// ------------------ Comments ------------------
+export const SingleLineComment = createToken({
+  name: "SingleLineComment",
+  pattern: /#.*/,
+  group: Lexer.SKIPPED,
+});
+
 // ------------------ Other Identifiers ------------------
 export const Identifier = createToken({
   name: "Identifier",
@@ -119,6 +126,7 @@ const allTokens = [
   When,
   Then,
   Perform,
+  SingleLineComment,
   EntityLiteral,
   RelationshipLiteral,
   Identifier,
