@@ -67,10 +67,9 @@ export class OQLToAstVisitor extends BaseOQLVisitor {
   }
 
   addStatement(ctx: Context) {
-    // TODO: Support adding relationship types
     return {
       type: "add",
-      entityType: ctx.type[0].image,
+      thingType: ctx.type[0].image,
       name: ctx.name?.[0].image,
     };
   }
