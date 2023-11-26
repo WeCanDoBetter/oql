@@ -77,13 +77,8 @@ export function parseAST(type: ParseType, input: string) {
  * @returns An Odin Query Language AST.
  * @throws {AggregateError} If the query string is invalid.
  */
-export function query(strings: TemplateStringsArray, ...keys: string[]) {
-  const query = strings.reduce((acc, str, i) => {
-    const key = keys[i - 1];
-    return acc + key + str;
-  });
-
-  return parseAST(ParseType.Query, query);
+export function query(input: string) {
+  return parseAST(ParseType.Query, input);
 }
 
 /**
@@ -91,13 +86,8 @@ export function query(strings: TemplateStringsArray, ...keys: string[]) {
  * @returns An Odin Query Language AST.
  * @throws {AggregateError} If the statement string is invalid.
  */
-export function statement(strings: TemplateStringsArray, ...keys: string[]) {
-  const statement = strings.reduce((acc, str, i) => {
-    const key = keys[i - 1];
-    return acc + key + str;
-  });
-
-  return parseAST(ParseType.Statement, statement);
+export function statement(input: string) {
+  return parseAST(ParseType.Statement, input);
 }
 
 /**
@@ -105,11 +95,6 @@ export function statement(strings: TemplateStringsArray, ...keys: string[]) {
  * @returns An Odin Query Language AST.
  * @throws {AggregateError} If the rule string is invalid.
  */
-export function rule(strings: TemplateStringsArray, ...keys: string[]) {
-  const rule = strings.reduce((acc, str, i) => {
-    const key = keys[i - 1];
-    return acc + key + str;
-  });
-
-  return parseAST(ParseType.Rule, rule);
+export function rule(input: string) {
+  return parseAST(ParseType.Rule, input);
 }

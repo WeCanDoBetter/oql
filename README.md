@@ -41,27 +41,27 @@ import {
 
 // Parse a query into an abstract syntax tree (AST).
 // A query consists of one or more statements.
-const queryTree = query`match (p:Person); return p;"`;
+const queryTree = query("match (p:Person); return p;");
 
 // Parse a statement into an AST.
-const statementTree = statement`match (p:Person);`;
+const statementTree = statement("match (p:Person);");
 
 // Parse a rule into an AST.
 // A rule consists of an optional name, a when clause, and a then clause.
-const ruleTree = rule`
+const ruleTree = rule(`
   rule MyRule when {
     match (p:Person);
   } then {
     create p->[:WORKS_FOR]->(:Company {name: 'Acme'});
   }
-`;
+`);
 
 // Use the parse function to parse a string into an AST.
 // Supports `query`, `statement`, and `rule` types.
 const ast = parseAST(ParseType.Statement, "match (p:Person);");
 ```
 
-If you want the [chevrotain](https://chevrotain.io/) concrete syntax tree (CST),
+If you want the [Chevrotain](https://chevrotain.io/) concrete syntax tree (CST),
 you can get it from the `parseCST` function.
 
 ```ts
