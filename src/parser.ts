@@ -53,7 +53,6 @@ class OqlParser extends CstParser {
   public query = this.RULE("query", () => {
     this.AT_LEAST_ONE(() => {
       this.SUBRULE(this.statement);
-      this.OPTION(() => this.CONSUME(SemiColon));
     });
   });
 
@@ -68,6 +67,7 @@ class OqlParser extends CstParser {
       { ALT: () => this.SUBRULE(this.deleteStatement) },
       { ALT: () => this.SUBRULE(this.performStatement) },
     ]);
+    this.OPTION(() => this.CONSUME(SemiColon));
   });
 
   /**
