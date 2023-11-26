@@ -124,7 +124,7 @@ class OqlParser extends CstParser {
       {
         ALT: () => {
           this.CONSUME(RelationshipLiteral, { LABEL: "type" });
-          this.CONSUME(RelationshipType, { LABEL: "name" });
+          this.CONSUME1(Identifier, { LABEL: "name" });
         },
       },
     ]);
