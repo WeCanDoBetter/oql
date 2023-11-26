@@ -13,7 +13,7 @@ export class OQLToAstVisitor extends BaseOQLVisitor {
   query(ctx: Context) {
     return {
       type: "query",
-      statements: ctx.statement.map((s: any) => this.visit(s)),
+      children: ctx.statement.map((s: any) => this.visit(s)),
     };
   }
 
@@ -40,6 +40,7 @@ export class OQLToAstVisitor extends BaseOQLVisitor {
   }
 
   ruleStatement(ctx: Context) {
+    // TODO: Support multiple statements in clauses
     return {
       type: "rule",
       when: this.visit(ctx.when[1]),
@@ -51,8 +52,6 @@ export class OQLToAstVisitor extends BaseOQLVisitor {
     return ctx.matchStatement.map((m: any) => this.visit(m));
   }
 
-  // TODO: Support multiple statements in a rule's then clause
-  // place them in order in which they appear in the rule
   ruleThenClause(ctx: Context) {
     if (ctx.createStatement) {
       return this.visit(ctx.createStatement);
@@ -68,6 +67,7 @@ export class OQLToAstVisitor extends BaseOQLVisitor {
   }
 
   addStatement(ctx: Context) {
+    // TODO: Support adding relationship types
     return {
       type: "add",
       entityType: ctx.type[0].image,
@@ -106,15 +106,7 @@ export class OQLToAstVisitor extends BaseOQLVisitor {
   }
 
   returnClause(ctx: Context) {
-    const property = ctx.property[0];
-
-    if (property.name) {
-      return this.visit(property);
-    } else {
-      return {
-        name: property.image,
-      };
-    }
+    return this.nameOrVisit(ctx.property[0]);
   }
 
   setPropertyStatement(ctx: Context) {
@@ -125,24 +117,17 @@ export class OQLToAstVisitor extends BaseOQLVisitor {
   }
 
   propertyAssignment(ctx: Context) {
-    const property = this.visit(ctx.property);
-    const value = this.visit(ctx.value);
-
     return {
-      property,
-      value,
+      property: this.visit(ctx.property),
+      value: this.visit(ctx.value),
     };
   }
 
   propertyCondition(ctx: Context) {
-    const property = this.visit(ctx.property);
-    const operator = ctx.operator[0].image;
-    const value = this.visit(ctx.value);
-
     return {
-      property,
-      operator,
-      value,
+      property: this.visit(ctx.property),
+      operator: ctx.operator[0].image,
+      value: this.visit(ctx.value),
     };
   }
 
@@ -155,6 +140,7 @@ export class OQLToAstVisitor extends BaseOQLVisitor {
 
   literal(ctx: Context) {
     return {
+      // TODO: Handle type better
       type: ctx.value[0].tokenType.name.toLowerCase(),
       value: ctx.value[0].image,
     };
@@ -163,30 +149,14 @@ export class OQLToAstVisitor extends BaseOQLVisitor {
   unsetPropertyStatement(ctx: Context) {
     return {
       type: "unset",
-      properties: ctx.property.map((p: any) => {
-        if (p.name) {
-          return this.visit(p);
-        } else {
-          return {
-            name: p.image,
-          };
-        }
-      }),
+      children: ctx.property.map(this.nameOrVisit.bind(this)),
     };
   }
 
   deleteStatement(ctx: Context) {
     return {
       type: "delete",
-      properties: ctx.property.map((p: any) => {
-        if (p.name) {
-          return this.visit(p);
-        } else {
-          return {
-            name: p.image,
-          };
-        }
-      }),
+      children: ctx.property.map(this.nameOrVisit.bind(this)),
     };
   }
 
@@ -199,8 +169,9 @@ export class OQLToAstVisitor extends BaseOQLVisitor {
 
   entity(ctx: Context) {
     return {
+      type: "entity",
       name: ctx.name?.[0].image,
-      type: ctx.type[0].image,
+      entityType: ctx.type[0].image,
       properties: this.visit(ctx.properties),
     };
   }
@@ -208,26 +179,51 @@ export class OQLToAstVisitor extends BaseOQLVisitor {
   relationship(ctx: Context) {
     return {
       name: ctx.name?.[0].image,
-      type: ctx.type[0].image,
+      relationshipType: ctx.type[0].image,
     };
   }
 
   entityOrPattern(ctx: Context) {
-    const entities = ctx.entity.map((e: any) => this.visit(e));
-    const relationships = ctx.relationship?.map((r: any) => this.visit(r));
-    const targets = ctx.target?.map((t: any) => this.visit(t));
+    const hasPattern = ctx.relationship?.length > 0;
 
-    return {
-      entities,
-      relationships,
-      targets,
-    };
+    if (hasPattern) {
+      // TODO: Add pattern direction
+      const allEntities = [...ctx.entity, ...ctx.target];
+      const allRelationships = ctx.relationship;
+      const triples: any[] = [];
+
+      for (let i = 0; i < allEntities.length; i += 2) {
+        triples.push({
+          type: "relationship",
+          source: this.visit(allEntities[i]),
+          relationshipType: allRelationships[i].children.type[0].image,
+          target: this.visit(allEntities[i + 1]),
+        });
+      }
+
+      return {
+        type: "pattern",
+        children: triples,
+      };
+    } else {
+      return this.visit(ctx.entity);
+    }
   }
 
   propertyObject(ctx: Context) {
-    return {
-      key: ctx.key[0].image,
-      value: this.visit(ctx.value),
-    };
+    return ctx.key.map((k: any, i: number) => ({
+      key: k.image,
+      value: this.visit(ctx.value[i]),
+    }));
+  }
+
+  private nameOrVisit(p: any) {
+    if (p.name) {
+      return this.visit(p);
+    } else {
+      return {
+        name: p.image,
+      };
+    }
   }
 }
