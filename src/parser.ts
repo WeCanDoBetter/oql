@@ -51,6 +51,7 @@ class OqlParser extends CstParser {
    * A query consists of one or more statements separated by semicolons.
    */
   public query = this.RULE("query", () => {
+    this.OPTION(() => this.SUBRULE(this.performStatement));
     this.AT_LEAST_ONE(() => {
       this.SUBRULE(this.statement);
     });
@@ -65,7 +66,6 @@ class OqlParser extends CstParser {
       { ALT: () => this.SUBRULE(this.setPropertyStatement) },
       { ALT: () => this.SUBRULE(this.unsetPropertyStatement) },
       { ALT: () => this.SUBRULE(this.deleteStatement) },
-      { ALT: () => this.SUBRULE(this.performStatement) },
     ]);
     this.OPTION(() => this.CONSUME(SemiColon));
   });
