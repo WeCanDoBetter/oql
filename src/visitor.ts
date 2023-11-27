@@ -1,3 +1,24 @@
+import type {
+  AddStatementCstChildren,
+  CreateStatementCstChildren,
+  DeleteStatementCstChildren,
+  EntityCstChildren,
+  EntityOrPatternCstChildren,
+  LiteralCstChildren,
+  MatchClauseCstChildren,
+  PerformStatementCstChildren,
+  PropertyCstChildren,
+  QueryCstChildren,
+  RelationshipCstChildren,
+  ReturnClauseCstChildren,
+  ReturnStatementCstChildren,
+  RuleThenClauseCstChildren,
+  RuleWhenClauseCstChildren,
+  SetPropertyStatementCstChildren,
+  StatementCstChildren,
+  UnsetPropertyStatementCstChildren,
+  WhereClauseCstChildren,
+} from "./cst.js";
 import { parser } from "./parser.js";
 
 const BaseOQLVisitor = parser.getBaseCstVisitorConstructor();
@@ -10,14 +31,14 @@ export class OQLToAstVisitor extends BaseOQLVisitor {
     this.validateVisitor();
   }
 
-  query(ctx: Context) {
+  query(ctx: QueryCstChildren) {
     return {
       type: "query",
       children: ctx.statement.map((s: any) => this.visit(s)),
     };
   }
 
-  statement(ctx: Context) {
+  statement(ctx: StatementCstChildren) {
     if (ctx.addStatement) {
       return this.visit(ctx.addStatement);
     } else if (ctx.createStatement) {
@@ -30,10 +51,6 @@ export class OQLToAstVisitor extends BaseOQLVisitor {
       return this.visit(ctx.unsetPropertyStatement);
     } else if (ctx.deleteStatement) {
       return this.visit(ctx.deleteStatement);
-    } else if (ctx.performStatement) {
-      return this.visit(ctx.performStatement);
-    } else if (ctx.ruleStatement) {
-      return this.visit(ctx.ruleStatement);
     } else if (ctx.returnStatement) {
       return this.visit(ctx.returnStatement);
     }
@@ -48,11 +65,11 @@ export class OQLToAstVisitor extends BaseOQLVisitor {
     };
   }
 
-  ruleWhenClause(ctx: Context) {
+  ruleWhenClause(ctx: RuleWhenClauseCstChildren) {
     return ctx.matchStatement.map((m: any) => this.visit(m));
   }
 
-  ruleThenClause(ctx: Context) {
+  ruleThenClause(ctx: RuleThenClauseCstChildren) {
     if (ctx.createStatement) {
       return this.visit(ctx.createStatement);
     } else if (ctx.setPropertyStatement) {
@@ -66,15 +83,15 @@ export class OQLToAstVisitor extends BaseOQLVisitor {
     }
   }
 
-  addStatement(ctx: Context) {
+  addStatement(ctx: AddStatementCstChildren) {
     return {
       type: "add",
-      thingType: ctx.type[0].image,
+      thingType: ctx.type?.[0].image,
       name: ctx.name?.[0].image,
     };
   }
 
-  createStatement(ctx: Context) {
+  createStatement(ctx: CreateStatementCstChildren) {
     return {
       type: "create",
       children: ctx.entityOrPattern.map((e: any) => this.visit(e)),
@@ -89,26 +106,26 @@ export class OQLToAstVisitor extends BaseOQLVisitor {
     };
   }
 
-  matchClause(ctx: Context) {
+  matchClause(ctx: MatchClauseCstChildren) {
     return ctx.entityOrPattern.map((e: any) => this.visit(e));
   }
 
-  whereClause(ctx: Context) {
+  whereClause(ctx: WhereClauseCstChildren) {
     return ctx.condition.map((c: any) => this.visit(c));
   }
 
-  returnStatement(ctx: Context) {
+  returnStatement(ctx: ReturnStatementCstChildren) {
     return {
       type: "return",
-      children: ctx.returnClause.map((r: any) => this.visit(r)),
+      children: ctx.returnClause?.map((r: any) => this.visit(r)),
     };
   }
 
-  returnClause(ctx: Context) {
-    return this.nameOrVisit(ctx.property[0]);
+  returnClause(ctx: ReturnClauseCstChildren) {
+    return this.nameOrVisit(ctx.property?.[0]);
   }
 
-  setPropertyStatement(ctx: Context) {
+  setPropertyStatement(ctx: SetPropertyStatementCstChildren) {
     return {
       type: "set",
       children: ctx.propertyAssignment.map((p: any) => this.visit(p)),
@@ -130,65 +147,65 @@ export class OQLToAstVisitor extends BaseOQLVisitor {
     };
   }
 
-  property(ctx: Context) {
+  property(ctx: PropertyCstChildren) {
     return {
       name: ctx.name?.[0].image,
       key: ctx.key[0].image,
     };
   }
 
-  literal(ctx: Context) {
+  literal(ctx: LiteralCstChildren) {
     return {
       // TODO: Handle type better
-      type: ctx.value[0].tokenType.name.toLowerCase(),
-      value: ctx.value[0].image,
+      type: ctx.value?.[0].tokenType.name.toLowerCase(),
+      value: ctx.value?.[0].image,
     };
   }
 
-  unsetPropertyStatement(ctx: Context) {
+  unsetPropertyStatement(ctx: UnsetPropertyStatementCstChildren) {
     return {
       type: "unset",
-      children: ctx.property.map(this.nameOrVisit.bind(this)),
+      children: ctx.property?.map(this.nameOrVisit.bind(this)),
     };
   }
 
-  deleteStatement(ctx: Context) {
+  deleteStatement(ctx: DeleteStatementCstChildren) {
     return {
       type: "delete",
-      children: ctx.property.map(this.nameOrVisit.bind(this)),
+      children: ctx.property?.map(this.nameOrVisit.bind(this)),
     };
   }
 
-  performStatement(ctx: Context) {
+  performStatement(ctx: PerformStatementCstChildren) {
     return {
       type: "perform",
       action: ctx.action[0].image,
     };
   }
 
-  entity(ctx: Context) {
+  entity(ctx: EntityCstChildren) {
     return {
       type: "entity",
       alias: ctx.alias?.[0].image,
       entityType: ctx.type[0].image,
-      properties: this.visit(ctx.properties),
+      properties: this.visit(ctx.properties!),
     };
   }
 
-  relationship(ctx: Context) {
+  relationship(ctx: RelationshipCstChildren) {
     return {
       alias: ctx.alias?.[0].image,
       relationshipType: ctx.type[0].image,
     };
   }
 
-  entityOrPattern(ctx: Context) {
-    const hasPattern = ctx.relationship?.length > 0;
+  entityOrPattern(ctx: EntityOrPatternCstChildren) {
+    const hasPattern = ctx.relationship?.length ?? 0 > 0;
 
     if (hasPattern) {
       // TODO: Add pattern direction
-      const allEntities = [...ctx.entity, ...ctx.target];
-      const allRelationships = ctx.relationship;
+      const allEntities = [...ctx.entity, ...ctx.target!];
+      const allRelationships = ctx.relationship!;
       const triples: any[] = [];
 
       for (let i = 0; i < allEntities.length; i += 2) {
