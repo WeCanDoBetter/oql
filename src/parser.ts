@@ -267,7 +267,7 @@ class OqlParser extends CstParser {
   /** `(p:Person { name: "John" })` */
   public entity = this.RULE("entity", () => {
     this.CONSUME(LeftParen);
-    this.OPTION(() => this.CONSUME(Identifier, { LABEL: "name" }));
+    this.OPTION(() => this.CONSUME(Identifier, { LABEL: "alias" }));
     this.CONSUME(Colon);
     this.CONSUME1(Identifier, { LABEL: "type" });
     this.OPTION1(() =>
@@ -279,7 +279,7 @@ class OqlParser extends CstParser {
   /** `[r:RELATIONSHIP_TYPE]` */
   public relationship = this.RULE("relationship", () => {
     this.CONSUME(LeftBracket);
-    this.OPTION(() => this.CONSUME(Identifier, { LABEL: "name" }));
+    this.OPTION(() => this.CONSUME(Identifier, { LABEL: "alias" }));
     this.CONSUME(Colon);
     this.CONSUME1(Identifier, { LABEL: "type" });
     this.OPTION1(() => {

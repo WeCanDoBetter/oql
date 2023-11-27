@@ -169,7 +169,7 @@ export class OQLToAstVisitor extends BaseOQLVisitor {
   entity(ctx: Context) {
     return {
       type: "entity",
-      name: ctx.name?.[0].image,
+      alias: ctx.alias?.[0].image,
       entityType: ctx.type[0].image,
       properties: this.visit(ctx.properties),
     };
@@ -177,7 +177,7 @@ export class OQLToAstVisitor extends BaseOQLVisitor {
 
   relationship(ctx: Context) {
     return {
-      name: ctx.name?.[0].image,
+      alias: ctx.alias?.[0].image,
       relationshipType: ctx.type[0].image,
     };
   }
