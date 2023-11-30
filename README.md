@@ -25,9 +25,6 @@ npm install
 
 ## Usage
 
-> ⚠️ The grammar and parser are incomplete and still in flux. The examples below
-> may not work as expected. Expect breaking changes.
-
 ### Parse a string into an abstract syntax tree (AST)
 
 ```ts
@@ -52,7 +49,7 @@ const ruleTree = rule(`
   rule MyRule when {
     match (p:Person);
   } then {
-    create p->[:WORKS_FOR]->(:Company {name: 'Acme'});
+    create p-[:WORKS_FOR]->(:Company {name: 'Acme'});
   }
 `);
 
