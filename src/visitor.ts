@@ -34,7 +34,7 @@ export class OQLToAstVisitor extends BaseOQLVisitor {
   query(ctx: QueryCstChildren) {
     return {
       type: "query",
-      children: ctx.statement.map((s: any) => this.visit(s)),
+      children: ctx.statement.map((s) => this.visit(s)),
     };
   }
 
@@ -66,7 +66,7 @@ export class OQLToAstVisitor extends BaseOQLVisitor {
   }
 
   ruleWhenClause(ctx: RuleWhenClauseCstChildren) {
-    return ctx.matchStatement.map((m: any) => this.visit(m));
+    return ctx.matchStatement.map((m) => this.visit(m));
   }
 
   ruleThenClause(ctx: RuleThenClauseCstChildren) {
@@ -94,7 +94,7 @@ export class OQLToAstVisitor extends BaseOQLVisitor {
   createStatement(ctx: CreateStatementCstChildren) {
     return {
       type: "create",
-      children: ctx.entityOrPattern.map((e: any) => this.visit(e)),
+      children: ctx.entityOrPattern.map((e) => this.visit(e)),
     };
   }
 
@@ -107,17 +107,17 @@ export class OQLToAstVisitor extends BaseOQLVisitor {
   }
 
   matchClause(ctx: MatchClauseCstChildren) {
-    return ctx.entityOrPattern.map((e: any) => this.visit(e));
+    return ctx.entityOrPattern.map((e) => this.visit(e));
   }
 
   whereClause(ctx: WhereClauseCstChildren) {
-    return ctx.condition.map((c: any) => this.visit(c));
+    return ctx.condition.map((c) => this.visit(c));
   }
 
   returnStatement(ctx: ReturnStatementCstChildren) {
     return {
       type: "return",
-      children: ctx.returnClause?.map((r: any) => this.visit(r)),
+      children: ctx.returnClause?.map((r) => this.visit(r)),
     };
   }
 
@@ -128,7 +128,7 @@ export class OQLToAstVisitor extends BaseOQLVisitor {
   setPropertyStatement(ctx: SetPropertyStatementCstChildren) {
     return {
       type: "set",
-      children: ctx.propertyAssignment.map((p: any) => this.visit(p)),
+      children: ctx.propertyAssignment.map((p) => this.visit(p)),
     };
   }
 
