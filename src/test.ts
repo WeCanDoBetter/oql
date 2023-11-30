@@ -1,6 +1,7 @@
 import { parseAST, ParseType } from "./util.js";
 
-const q = "set p.age = 42; # this is a comment";
+const q =
+  "create (p:Person); create (:Person)-[r:KNOWS]->(c:City { name: 'The Hague' }); set p.age = 42; return p, p.name;";
 
 const ast = parseAST(ParseType.Query, q);
 

@@ -118,19 +118,10 @@ class OqlParser extends CstParser {
   private addStatement = this.RULE("addStatement", () => {
     this.CONSUME(Add);
     this.OR([
-      {
-        ALT: () => {
-          this.CONSUME(EntityLiteral, { LABEL: "type" });
-          this.CONSUME(Identifier, { LABEL: "name" });
-        },
-      },
-      {
-        ALT: () => {
-          this.CONSUME(RelationshipLiteral, { LABEL: "type" });
-          this.CONSUME1(Identifier, { LABEL: "name" });
-        },
-      },
+      { ALT: () => this.CONSUME(EntityLiteral, { LABEL: "type" }) },
+      { ALT: () => this.CONSUME(RelationshipLiteral, { LABEL: "type" }) },
     ]);
+    this.CONSUME(Identifier, { LABEL: "name" });
   });
 
   // create (p:Person { name: "John" })-[r:KNOWS]->(p2:Person { name: "Jane" })
@@ -210,7 +201,6 @@ class OqlParser extends CstParser {
       { ALT: () => this.CONSUME(NotEquals, { LABEL: "operator" }) },
       { ALT: () => this.CONSUME(LessThan, { LABEL: "operator" }) },
       { ALT: () => this.CONSUME(GreaterThan, { LABEL: "operator" }) },
-      { ALT: () => this.CONSUME(Not, { LABEL: "operator" }) },
     ]);
     this.OR1([
       { ALT: () => this.SUBRULE(this.literal, { LABEL: "value" }) },

@@ -1,3 +1,4 @@
+import type { ParseTypeToCSTType } from "./types.js";
 import { parser } from "./parser.js";
 import { lexer } from "./lexer.js";
 import { OQLToAstVisitor } from "./visitor.js";
@@ -44,7 +45,10 @@ export enum ParseType {
  * @param input The string to parse.
  * @throws {AggregateError} If the input is invalid.
  */
-export function parseCST(type: ParseType, input: string) {
+export function parseCST<T extends ParseType>(
+  type: T,
+  input: string,
+): ParseTypeToCSTType<T> {
   const { tokens } = lexer.tokenize(input);
   parser.input = tokens;
   const cst = parser[type]();
@@ -53,7 +57,7 @@ export function parseCST(type: ParseType, input: string) {
     throw new AggregateError(parser.errors, `Failed to parse ${type}`);
   }
 
-  return cst;
+  return cst as ParseTypeToCSTType<T>;
 }
 
 /**

@@ -1,3 +1,4 @@
+export type * from "./cst.js";
 export { lexer } from "./lexer.js";
 export { parser } from "./parser.js";
 export { OQLToAstVisitor } from "./visitor.js";
